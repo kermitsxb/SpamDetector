@@ -1,0 +1,11 @@
+
+	Django
+	------
+
+	Create a project:		django-admin startproject <mysite>
+
+	Start django dev server :	python manage.py runserver
+								python manage.py runserver 8080
+								python manage.py runserver 0.0.0.0:8000
+
+	Create the app :		python manage.py startapp <polls>
