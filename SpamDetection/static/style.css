@@ -8,6 +8,15 @@ and open the template in the editor.
     Author     : tony
 */
 
-p {
-    color: red;
+body {
+    margin-left: 20%;
+}
+
+#menu {
+    position: fixed; 
+    left:0; 
+    top:0; 
+    bottom:0; 
+    border:1px solid black; 
+    width: 17%;
 }
