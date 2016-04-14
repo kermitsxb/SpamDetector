@@ -12,7 +12,7 @@ from copy import deepcopy
 if __name__ == "__main__":
     print "Hello World"
 
-class KMeanClusterer():
+class KMeanClusterer(object):
     
     def getClusterNumber(self):
         return self.k
@@ -23,57 +23,145 @@ class KMeanClusterer():
         else:
             return Cluster()
     
-    def assignement(self):
-        current_line = 0
-        """
+    def assignement(self, step):
+        # Empty clusters
+        for cluster in self.clusters:
+            cluster.resetObservations()
+        
+        # Foreach "line" in dataset
         for obs in self.data:
             global_dist = sys.maxint
-            closer = 0
-            iterator = 0
+            the_cluster = Cluster()
             
+            # Foreach cluster : find closest cluster to current line
             for cluster in self.clusters:
                 current_dist = self.computeDistance(obs, cluster.getCentroid())
                 if current_dist < global_dist:
-                    #closer = iterator
+                    the_cluster = cluster
                     global_dist = current_dist
                     
-                iterator += 1
                 
             
-            self.clusters[closer].addObservation(tuple(obs))
-            current_line += 1
-            
-        print("Nb itération %d" % (current_line))
-        """
+            the_cluster.addObservation(tuple(obs))
+                 
+        self.cleanEmptyClusters()
+         
+    def currentCentroids(self):
+        centroids = []
         
-        print(len(self.data))
-        for l in self.data:
-            self.clusters[0].addObservation(l)
-        
-        a = 0
-        for i in range(self.k):
-            c = self.clusters[i]
-            o = c.getObservations()
-            a+=len(o)
-        print("Total %d" % (a))
+        for cluster in self.clusters:
+            centroids.append(cluster.getCentroid())
             
+        return centroids
+            
+    def nextCentroids(self):
+        centroids = []
+        
+        for cluster in self.clusters:
+            centroids.append(self.computeCentroid(cluster))
+            
+        return centroids
     
     def computeDistance(self, obs, centroid):
+        c = self.columns
         somme = 0
-        for i in range(4):
-            somme += (float(obs[i]) - float(centroid[i])) **2
+        
+        # Foreach used column
+        for i in range(len(c)):
+            somme += (float(obs[c[i]]) - float(centroid[c[i]])) **2
         return math.sqrt(somme)
     
-    def __init__(self, k, datafile):
-        #super(KMeanClusterer, self, k ,datafile).__init__()
+    def computeCentroid(self, cluster):
+        observations = cluster.getObservations()
+        nbElem = len(observations)
+                
+        c = self.columns
+        cols = [0 for i in range(len(c))]
+
+        # Iterate on cluster observations
+        for j in range(nbElem):
+            tup = observations[j]
+
+            for k in range(len(cols)):
+                cols[k] = cols[k] + float(tup[c[k]])
+
+        # New center
+        newBarycentreArray = []
+        index = 0
         
+        for i in range(self.row_length):
+            if i in c:
+                #if nbElem > 0:
+                newBarycentreArray.append(cols[index] / nbElem)
+                #else:
+                #    newBarycentreArray.append(0)
+                index += 1
+            else:
+                newBarycentreArray.append(0)
+            
+        # TP3 Specific
+        #newBarycentreArray.append("")
+        
+        newBarycentre = tuple(newBarycentreArray)
+                
+        # Find closest observation to new center
+        global_dist = sys.maxint
+        found = []
+        
+        for obs in observations:    
+            current_dist = self.computeDistance(obs, newBarycentre)
+            if current_dist < global_dist:
+                found = obs
+                global_dist = current_dist
+                
+        return found
+    
+    def printClusters(self):
+        for i in range(len(self.clusters)):
+            observations = self.clusters[i].getObservations()
+            spams = 0
+            nospams = 0
+            
+            print("***** Cluster %d -- %d elements *****" % (i + 1, len(observations)))
+            for obs in observations:
+                if float(obs[57]) == 1:
+                    spams += 1
+                else:
+                    nospams += 1
+                    
+            print("\t %d spams, %d non spams" % (spams, nospams))
+            
+        print("**********************")
+        
+    def cleanEmptyClusters(self):
+        to_delete = []
+        
+        for cluster in self.clusters:
+            if cluster.getObservationsNumber() == 0:
+                to_delete.append(cluster)
+                
+        for cluster in to_delete:
+            self.clusters.remove(cluster)
+                
+        self.k = len(self.clusters)
+            
+    def __init__(self, k, columns, datafile):
+        super(KMeanClusterer, self).__init__()
+        
+        # Number of clusters wanted
         self.k = k
         
+        # columns to work with
+        self.columns = columns
+        
         # Get CSV data
-        norm = Normalizer()
-        self.data = norm.load_csv(datafile)
+        norm = Normalizer(datafile)
+        self.data = norm.normalize()
+        self.row_length = norm.getRowLength()
         self.clusters = []
         
+        norm.stats()
+
         # Find random centroids
         sample = random.sample(range(1, len(self.data)), self.k)
         
@@ -85,22 +173,29 @@ class KMeanClusterer():
                     
         
         
-class Cluster():
+class Cluster(object):
     
     def setCentroid(self, centroid):
         self.centroid = tuple(centroid)
     
     def getCentroid(self):
         return self.centroid
-    
+        
     def getObservations(self):
         return self.observations
     
     def addObservation(self, obs):
-        self.observations.add(deepcopy(tuple(obs)))
+        self.observations.append(obs)
+        
+    def resetObservations(self):
+        self.observations = []
+        
+    def getObservationsNumber(self):
+        return len(self.observations)
     
     def __init__(self):
-        #super(Cluster, self).__init__()
+        super(Cluster, self).__init__()
         
-        self.observations = set()
+        self.resetObservations()
         self.centroid = tuple()
+    
