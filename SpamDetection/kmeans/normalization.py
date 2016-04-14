@@ -5,15 +5,17 @@ import sys
 class Normalizer(object):
     
     def getRowLength(self):
+        """Retourne la longueur d'une ligne du dataset"""
         return self.row_length
     
     def show_matrix_dataset(self, iris_data_matrix):
+        """Affiche le dataset"""
         print("Show matrix dataset")
         for row in iris_data_matrix:
             print(row)
     
     def load_csv(self, dataFile):
-        
+        """Recupere les donnees du dataset dans une variable locale"""
         data_matrix = []
          
         data = open(dataFile,'r')
@@ -36,9 +38,11 @@ class Normalizer(object):
         self.data_matrix = data_matrix        
 
     def get_csv(self):
+        """Renvoi les donnees du dataset depuis une variable"""
         return self.data_matrix
     
     def find_min_max(self):
+        """ Recupere les minimums et maximums pour chaque colonne sur l'espace non normalise"""
         for line in self.data_matrix:
             
             for i in range(self.row_length):
@@ -47,10 +51,6 @@ class Normalizer(object):
                     
                 if float(line[i]) > self.maxs[i]:
                     self.maxs[i] = float(line[i])
-    
-        print(self.maxs)
-        print(self.mins)
-        print("-----")
         
     def stats(self):
         """Retourne les statistiques pour chaque colonne sous la formes stats[col_index] = [min, max, moyenne, ecart_type]"""
@@ -74,29 +74,28 @@ class Normalizer(object):
             stats_line.append(moyenne)
             stats_line.append(ecartype)
             
-            stats.append(stats_line)
-            
-            print("Colonne %d" % (i))
-            print(stats_line)
-            print("------")
-        
-        
+            stats.append(stats_line)      
         
         return stats
     
     def moyenne(self, array):
+        """Retourne la moyenne des valeurs d'un tableau"""
         return sum(array, 0.0) / len(array)
     
     def variance(self, array, m):
+        """Retourne la variance des valeurs d'un tableau"""
         return self.moyenne([(x - m)**2 for x in array])
         
     def ecartype(self, array, m):
+        """Retourne l'ecart type des valeurs d'un tableau"""
         return self.variance(array, m) **0.5
     
     def column(self, matrix, i):
+        """Renvoi une colonne d'un tableau multi dimensionnel en tant que tableau 1-D"""
         return [row[i] for row in matrix]
     
     def normalize(self):
+        """Normalise les donnees du dataset entre 0 et 1"""
         normalized = []
         self.find_min_max()
         
@@ -112,6 +111,7 @@ class Normalizer(object):
         return self.normalized
         
     def __init__(self, datafile):
+        """Constructeur pour la classe Normalizer"""
         super(Normalizer, self).__init__()
         
         self.data_matrix = []

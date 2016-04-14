@@ -7,7 +7,6 @@ from normalization import Normalizer
 import random
 import math
 import sys
-from copy import deepcopy
 
 if __name__ == "__main__":
     print "Hello World"
@@ -15,15 +14,18 @@ if __name__ == "__main__":
 class KMeanClusterer(object):
     
     def getClusterNumber(self):
+        """ Retourne le nombre de clusters """
         return self.k
     
     def getCluster(self, index):
+        """ Retourne le cluster d'index <index>"""
         if index >= 0 and index < self.k:
             return self.clusters[index]
         else:
             return Cluster()
     
     def assignement(self, step):
+        """ Assigne les points du dataset aux clusters selon la distance par rapport aux centroides"""
         # Empty clusters
         for cluster in self.clusters:
             cluster.resetObservations()
@@ -47,6 +49,7 @@ class KMeanClusterer(object):
         self.cleanEmptyClusters()
          
     def currentCentroids(self):
+        """Retourne un tableau contenant les centroides des clusters"""
         centroids = []
         
         for cluster in self.clusters:
@@ -55,6 +58,7 @@ class KMeanClusterer(object):
         return centroids
             
     def nextCentroids(self):
+        """Retourne un tableau contenant les centroides calcules des clusters"""
         centroids = []
         
         for cluster in self.clusters:
@@ -63,6 +67,7 @@ class KMeanClusterer(object):
         return centroids
     
     def computeDistance(self, obs, centroid):
+        """Calcul une distance entre un point et le centroid selon les colonnes definies"""
         c = self.columns
         somme = 0
         
@@ -72,6 +77,7 @@ class KMeanClusterer(object):
         return math.sqrt(somme)
     
     def computeCentroid(self, cluster):
+        """Calcul le centroide selon les observations actuelles du cluster"""
         observations = cluster.getObservations()
         nbElem = len(observations)
                 
@@ -98,10 +104,7 @@ class KMeanClusterer(object):
                 index += 1
             else:
                 newBarycentreArray.append(0)
-            
-        # TP3 Specific
-        #newBarycentreArray.append("")
-        
+                 
         newBarycentre = tuple(newBarycentreArray)
                 
         # Find closest observation to new center
@@ -117,23 +120,15 @@ class KMeanClusterer(object):
         return found
     
     def printClusters(self):
+        """Affiche les custers et le nb d'elem qu'ils contiennent"""
         for i in range(len(self.clusters)):
             observations = self.clusters[i].getObservations()
-            spams = 0
-            nospams = 0
             
-            print("***** Cluster %d -- %d elements *****" % (i + 1, len(observations)))
-            for obs in observations:
-                if float(obs[57]) == 1:
-                    spams += 1
-                else:
-                    nospams += 1
-                    
-            print("\t %d spams, %d non spams" % (spams, nospams))
-            
+            print("***** Cluster %d -- %d elements *****" % (i + 1, len(observations)))            
         print("**********************")
         
     def cleanEmptyClusters(self):
+        """Supprime les clusters vides"""
         to_delete = []
         
         for cluster in self.clusters:
@@ -146,6 +141,7 @@ class KMeanClusterer(object):
         self.k = len(self.clusters)
             
     def __init__(self, k, columns, datafile):
+        """Constructeur pour la classe KMeanClusterer"""
         super(KMeanClusterer, self).__init__()
         
         # Number of clusters wanted
@@ -176,24 +172,31 @@ class KMeanClusterer(object):
 class Cluster(object):
     
     def setCentroid(self, centroid):
+        """Defini le centroid <centroid> du cluster"""
         self.centroid = tuple(centroid)
     
     def getCentroid(self):
+        """Retourne le centroid courant du cluster"""
         return self.centroid
         
     def getObservations(self):
+        """Retourne les observations du cluster"""
         return self.observations
     
     def addObservation(self, obs):
+        """Ajoute une observation au cluster"""
         self.observations.append(obs)
         
     def resetObservations(self):
+        """Reinitialise les observations du cluster"""
         self.observations = []
         
     def getObservationsNumber(self):
+        """Retourne le nombre d'observations dans le cluser"""
         return len(self.observations)
     
     def __init__(self):
+        """Constructeur pour la classe Cluster"""
         super(Cluster, self).__init__()
         
         self.resetObservations()
