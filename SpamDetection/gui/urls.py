@@ -4,4 +4,4 @@ from gui import views
 urlpatterns = [
     url(r'^$', views.home),
     url(r'^upload/$', views.upload)
-]
+] 

@@ -13,7 +13,7 @@
 		<h1>Upload des données</h1>
 	</div>
 	<div class="well">
-		<form role="form">
+		<form role="form" method="post" enctype="multipart/form-data">
 			{% csrf_token %}
 			{{ form|bootstrap }}
 			<div class="form-group">

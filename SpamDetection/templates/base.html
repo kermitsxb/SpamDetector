@@ -36,9 +36,9 @@ and open the template in the editor.
       <a class="navbar-brand" href="#">SpamDetector</a>
       </div>
         <ul class="nav navbar-nav">
-            <li class="active"><a href="#">Upload<span class="sr-only">(current)</span></a></li>
-            <li><a href="#">Statistiques</a></li>
-            <li><a href="#">Graphiques</a></li>
+            <li{% if request.session.page == 'upload' %} class="active" {% endif %}><a href="#">Upload<span class="sr-only">(current)</span></a></li>
+            <li{% if request.session.page == 'stats' %} class="active" {% endif %} ><a href="#">Statistiques</a></li>
+            <li{% if request.session.page == 'graph' %} class="active" {% endif %}><a href="#">Graphiques</a></li>
         </div>
     </nav>
     {% block content %}
