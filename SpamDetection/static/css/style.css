@@ -10,3 +10,9 @@ body{
 	margin-bottom: 20px;
 	border-bottom: 1px solid #ddd;
 }
+
+.blank_row
+{
+    height: 10px !important; /* Overwrite any previous rules */
+    background-color: #FFFFFF;
+}

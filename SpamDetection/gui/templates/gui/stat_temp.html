@@ -5,8 +5,22 @@
 {% block content %}
 
 {% load bootstrap %}
+<div class="container">
+	<table class="table table-striped table-bordered table-list">
+		<thead>
+			<tr>
+				{% autoescape off %}{{ thead }}{% endautoescape %}
+			</tr>
+		</thead>
+		<tbody>
+			{% autoescape off %}{{ tbody }}{% endautoescape %}
 
+			{% autoescape off %}{{ tempty }}{% endautoescape %}
 
+			{% autoescape off %}{{ tstats }}{% endautoescape %}
+		</tbody>
+	</table>
+</div>
 
 
 {% endblock %}

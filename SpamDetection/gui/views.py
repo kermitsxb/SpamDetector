@@ -8,6 +8,7 @@ from gui.models import Document
 
 from kmeans.normalization import Normalizer
 import sys
+import csv
 
 
 # Vue de base ./
@@ -63,12 +64,51 @@ def statistiques(request, k, n):
 
 	norm = Normalizer(datafile)
 	data = norm.normalize()
+	row_length = norm.getRowLength()
 
-	stats = norm.stats
+	stats = norm.stats()
 
 	request.session['page'] = 'stats'
 
-	return render(request, 'gui/stat_temp.html')
+	data_name = open("data_names", "r")
+	print >>sys.stderr, '[DEBUG] K : ' + str(request.session['k'])
+	print >>sys.stderr, '[DEBUG] N : ' + str(request.session['n'])
+
+	html_head = ""
+	html_body = ""
+	html_stat = ""
+
+	for line in data_name:
+		html_head += "<th>" + str(line) + "</th>"
+
+	data_name.close()
+
+
+	for row in data:
+		html_body += "<tr>"
+		for col in row:
+			html_body += "<td>" + str(col) + "</td>"
+
+		html_body += "</tr>"
+
+	html_empty = "<tr class=""blank_row""><td colspan=" + str(row_length) + "></td></tr>"
+
+	#print >>sys.stderr, '[DEBUG] Stats[5][1] : ' + str(stats[5][1])
+
+	for j in range(0, 4):
+		tab = norm.column(stats, j)
+		html_stat += "<tr>"
+		print >>sys.stderr, '[DEBUG] J : ' + str(j)
+		#print >>sys.stderr, '[DEBUG] Stats[j] : ' + str(stats[j])
+		for i in range(0, len(tab)):
+			html_stat += "<td>" + str(tab[i]) + "</td>"
+			print >>sys.stderr, '[DEBUG] I : ' + str(i)
+			#print >>sys.stderr, '[DEBUG] Stats[j][i] : ' + str(stats[j][i])
+
+		html_stat += "</tr>"
+
+
+	return render(request, 'gui/stat_temp.html', {'thead': html_head, 'tbody': html_body, 'tempty': html_empty, 'tstats': html_stat})
 
 
 #Fonction qui appelle la vue générant les graphiques d3js pour l'affichage
