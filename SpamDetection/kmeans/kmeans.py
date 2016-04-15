@@ -4,6 +4,7 @@
 # and open the template in the editor.
 
 from normalization import Normalizer
+from operator import itemgetter
 import random
 import math
 import sys
@@ -165,9 +166,7 @@ class KMeanClusterer(object):
         
     def performClustering(self):
         """Realisation de toutes les etapes de clustering"""
-        
-        clusterNumber = self.getClusterNumber()
-        
+                
         #Definition de centroides aleatoires
         self.setRandomCentroids()
         
@@ -180,7 +179,7 @@ class KMeanClusterer(object):
         nbIterations = 0
 
         while self.compareCentroids(currentCentroids, newCentroids) is True:      
-            for i in range(clusterNumber):
+            for i in range(self.k):
                 currentCluster = self.getCluster(i)
                 currentCluster.setCentroid(newCentroids[i])          
 
@@ -193,6 +192,34 @@ class KMeanClusterer(object):
             nbIterations += 1
             
         print("Iterations : %d" % (nbIterations))
+        
+    def findNPercent(self, cluster):
+        percentage = self.n / 100.0
+        
+        observations = cluster.getObservations()
+        itemsToFind = int(percentage * len(observations))
+        centroid = cluster.getCentroid()
+
+        distances = []
+        
+        for i in range(len(observations)):
+            line = []
+            obs = observations[i]
+            distance = self.computeDistance(obs, centroid)
+            line.append(i)
+            line.append(distance)
+            distances.append(line)
+        
+        distances = sorted(distances, key=itemgetter(1), reverse=True)
+        
+        extracted = []
+        for i in range(itemsToFind):
+            index = distances[i][0]
+            extracted.append(observations[index])
+            
+        
+        return extracted
+        
             
     def __init__(self, k, n, columns, datafile):
         """Constructeur pour la classe KMeanClusterer"""
