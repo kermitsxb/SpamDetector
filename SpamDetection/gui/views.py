@@ -34,4 +34,4 @@ def upload(request):
 	    form = UploadForm()  # Nous créons un formulaire vide
 
 
-	    return render(request, 'gui/form_temp.html', locals())
+	    return render(request, 'gui/form_temp.html', {'form': form})

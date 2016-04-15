@@ -1,8 +1,26 @@
-<form class="form-horizontal" action="{% url "gui.views.upload" %}" method="post">
+{% extends "base.html" %}
 
-	{% csrf_token %}
+{% block title %}Ecran principal{% endblock %}
 
-	{{ form.as_p }}
-	<input type="submit" value="Submit" />
+{% block content %}
 
-</form>
+{% load bootstrap %}
+
+
+
+<div class="container">
+	<div class="page-header">
+		<h1>Upload des données</h1>
+	</div>
+	<div class="well">
+		<form role="form">
+			{% csrf_token %}
+			{{ form|bootstrap }}
+			<div class="form-group">
+				<button type="submit" class="btn btn-primary">Submit</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+{% endblock %}
