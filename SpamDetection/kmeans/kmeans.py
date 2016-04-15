@@ -17,6 +17,10 @@ class KMeanClusterer(object):
         """ Retourne le nombre de clusters """
         return self.k
     
+    def getClusters(self):
+        """Retourne la collection de clusters"""
+        return self.clusters
+    
     def getCluster(self, index):
         """ Retourne le cluster d'index <index>"""
         if index >= 0 and index < self.k:
@@ -24,7 +28,7 @@ class KMeanClusterer(object):
         else:
             return Cluster()
     
-    def assignement(self, step):
+    def assignement(self):
         """ Assigne les points du dataset aux clusters selon la distance par rapport aux centroides"""
         # Empty clusters
         for cluster in self.clusters:
@@ -95,14 +99,12 @@ class KMeanClusterer(object):
         newBarycentreArray = []
         index = 0
         
+        # Conversion du nouveau centre calcule en tuple avec le meme nombre de champs
         for i in range(self.row_length):
-            if i in c:
-                #if nbElem > 0:
+            if i in c: # Si c'est une colonne sur laquelle on travail
                 newBarycentreArray.append(cols[index] / nbElem)
-                #else:
-                #    newBarycentreArray.append(0)
                 index += 1
-            else:
+            else: #Sinon on ajoute un zero pour garder le meme nombre d'elements dans le tuple
                 newBarycentreArray.append(0)
                  
         newBarycentre = tuple(newBarycentreArray)
@@ -139,35 +141,76 @@ class KMeanClusterer(object):
             self.clusters.remove(cluster)
                 
         self.k = len(self.clusters)
+        
+    def compareCentroids(self, set1, set2):
+        """Compare deux sets contenant les centroids des clusters"""
+        difference = False
+        if len(set1) == len(set2):
+            for i in range(len(set1)):
+                if set1[i] != set2[i]:
+                    difference = True
+                    break
+
+        return difference
+    
+    def setRandomCentroids(self):
+        # Find random centroids
+        sample = random.sample(range(1, len(self.data)), self.k)
+        
+        # Create clusters and set random centroid
+        for i in range(self.k):
+            cluster = Cluster()
+            cluster.setCentroid(self.data[sample[i]])
+            self.clusters.append(cluster)
+        
+    def performClustering(self):
+        """Realisation de toutes les etapes de clustering"""
+        
+        clusterNumber = self.getClusterNumber()
+        
+        #Definition de centroides aleatoires
+        self.setRandomCentroids()
+        
+        #Assignement initial
+        self.assignement()
+        
+        #Iterations jusqu'a la convergence de l'algorithme
+        currentCentroids = self.currentCentroids()
+        newCentroids = self.nextCentroids()
+        nbIterations = 0
+
+        while self.compareCentroids(currentCentroids, newCentroids) is True:      
+            for i in range(clusterNumber):
+                currentCluster = self.getCluster(i)
+                currentCluster.setCentroid(newCentroids[i])          
+
+            print("Iteration %d" % (nbIterations + 1))
+            self.assignement()
+
+            currentCentroids = self.currentCentroids()
+            newCentroids = self.nextCentroids()
+
+            nbIterations += 1
             
-    def __init__(self, k, columns, datafile):
+        print("Iterations : %d" % (nbIterations))
+            
+    def __init__(self, k, n, columns, datafile):
         """Constructeur pour la classe KMeanClusterer"""
         super(KMeanClusterer, self).__init__()
         
         # Number of clusters wanted
         self.k = k
+        self.n = n
         
         # columns to work with
-        self.columns = columns
+        self.columns = sorted(columns)
         
         # Get CSV data
         norm = Normalizer(datafile)
         self.data = norm.normalize()
         self.row_length = norm.getRowLength()
         self.clusters = []
-        
-        norm.stats()
-
-        # Find random centroids
-        sample = random.sample(range(1, len(self.data)), self.k)
-        
-        # Create clusters and set random centroid
-        for i in range(k):
-            cluster = Cluster()
-            cluster.setCentroid(self.data[sample[i]])
-            self.clusters.append(cluster)
-                    
-        
+                            
         
 class Cluster(object):
     
