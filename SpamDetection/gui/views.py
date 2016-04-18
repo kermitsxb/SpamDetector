@@ -77,38 +77,62 @@ def statistiques(request, k, n):
 	html_head = ""
 	html_body = ""
 	html_stat = ""
+	html_foot = ""
+
+	html_head += "<th></th>"
 
 	for line in data_name:
-		html_head += "<th>" + str(line) + "</th>"
+		html_head += "<th><INPUT id=" + str(line) + " type=\"checkbox\" name=" + str(line) + " onclick='handleCheckbox(this);'> " + str(line) + "</th>"
 
 	data_name.close()
 
+	nRow = 1
 
 	for row in data:
 		html_body += "<tr>"
+		html_body += "<td>" + str(nRow) + "</td>"
 		for col in row:
 			html_body += "<td>" + str(col) + "</td>"
 
 		html_body += "</tr>"
+		nRow += 1
 
-	html_empty = "<tr class=""blank_row""><td colspan=" + str(row_length) + "></td></tr>"
+	#html_empty = "<tr class=""blank_row""><td colspan=" + str(row_length) + "></td></tr>"
 
 	#print >>sys.stderr, '[DEBUG] Stats[5][1] : ' + str(stats[5][1])
+	html_foot += "<tr><th></th>"
+	data_name = open("data_names", "r")
+	for line in data_name:
+		html_foot += "<th>" + str(line) + "</th>"
+	data_name.close()
+
+	html_foot += "</tr>"
 
 	for j in range(0, 4):
 		tab = norm.column(stats, j)
-		html_stat += "<tr>"
+		html_foot += "<tr>"
+
+		if j == 0:
+			html_foot += "<td>Min</td>"
+		elif j == 1:
+			html_foot += "<td>Max</td>"
+		elif j == 2:
+			html_foot += "<td>Moy</td>"
+		elif j == 3:
+			html_foot += "<td>ET</td>"
+
 		print >>sys.stderr, '[DEBUG] J : ' + str(j)
 		#print >>sys.stderr, '[DEBUG] Stats[j] : ' + str(stats[j])
 		for i in range(0, len(tab)):
-			html_stat += "<td>" + str(tab[i]) + "</td>"
+			html_foot += "<td>" + str(tab[i]) + "</td>"
 			print >>sys.stderr, '[DEBUG] I : ' + str(i)
 			#print >>sys.stderr, '[DEBUG] Stats[j][i] : ' + str(stats[j][i])
 
-		html_stat += "</tr>"
+		html_foot += "</tr>"
 
 
-	return render(request, 'gui/stat_temp.html', {'thead': html_head, 'tbody': html_body, 'tempty': html_empty, 'tstats': html_stat})
+
+	return render(request, 'gui/stat_temp.html', {'thead': html_head, 'tbody': html_body, 'tstats': html_stat, 'tfoot': html_foot})
 
 
 #Fonction qui appelle la vue générant les graphiques d3js pour l'affichage

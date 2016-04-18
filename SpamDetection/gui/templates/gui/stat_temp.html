@@ -6,21 +6,37 @@
 
 {% load bootstrap %}
 <div class="container">
-	<table class="table table-striped table-bordered table-list">
+	<table id="myTable" class="display" cellspacing="0" width="100%">
+
 		<thead>
 			<tr>
 				{% autoescape off %}{{ thead }}{% endautoescape %}
 			</tr>
 		</thead>
+		<tfoot>
+			{% autoescape off %}{{ tfoot }}{% endautoescape %}
+		</tfoot>
 		<tbody>
 			{% autoescape off %}{{ tbody }}{% endautoescape %}
 
-			{% autoescape off %}{{ tempty }}{% endautoescape %}
-
 			{% autoescape off %}{{ tstats }}{% endautoescape %}
 		</tbody>
+
+
 	</table>
 </div>
+
+<script>
+	$(document).ready(function () {
+		$('#myTable').DataTable({
+			"scrollX": true,
+			"ordering": false
+		});
+	});
+</script>
+
+
+
 
 
 {% endblock %}
