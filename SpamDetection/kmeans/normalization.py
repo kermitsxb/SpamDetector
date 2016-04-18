@@ -35,6 +35,7 @@ class Normalizer(object):
                 
             self.line_count += 1
             
+            
         self.data_matrix = data_matrix        
 
     def get_csv(self):
@@ -69,7 +70,7 @@ class Normalizer(object):
             stats_line.append(max(column_array))
             
             moyenne = self.moyenne(column_array)
-            ecartype = self.ecartype(column_array, moyenne)
+            ecartype = self.ecartype(column_array)
             
             stats_line.append(moyenne)
             stats_line.append(ecartype)
@@ -82,13 +83,13 @@ class Normalizer(object):
         """Retourne la moyenne des valeurs d'un tableau"""
         return sum(array, 0.0) / len(array)
     
-    def variance(self, array, m):
+    def variance(self, array):
         """Retourne la variance des valeurs d'un tableau"""
-        return self.moyenne([(x - m)**2 for x in array])
+        return self.moyenne([(x - self.moyenne(array))**2 for x in array])
         
-    def ecartype(self, array, m):
+    def ecartype(self, array):
         """Retourne l'ecart type des valeurs d'un tableau"""
-        return self.variance(array, m) **0.5
+        return self.variance(array) **0.5
     
     def column(self, matrix, i):
         """Renvoi une colonne d'un tableau multi dimensionnel en tant que tableau 1-D"""
@@ -102,12 +103,17 @@ class Normalizer(object):
         for line in self.data_matrix:
             new_line = []
             for i in range(self.row_length):
-                val = float(line[i])
-                new_line.append( (val - self.mins[i]) / (self.maxs[i] - self.mins[i]) )
+                val = float(line[i])             
                 
+                if self.maxs[i] > 0 and self.maxs[i] > self.mins[i]:
+                    new_line.append( (val - self.mins[i]) / (self.maxs[i] - self.mins[i]) )
+                else:
+                    new_line.append( val )
+                    
             normalized.append(new_line)
         
         self.normalized = normalized
+        
         return self.normalized
         
     def __init__(self, datafile):

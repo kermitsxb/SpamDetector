@@ -8,6 +8,7 @@ from operator import itemgetter
 import random
 import math
 import sys
+import json
 
 if __name__ == "__main__":
     print "Hello World"
@@ -49,9 +50,29 @@ class KMeanClusterer(object):
                     
                 
             
-            the_cluster.addObservation(tuple(obs))
+            the_cluster.addObservation(obs)
                  
         self.cleanEmptyClusters()
+        
+    def update(self):
+        #Iterations jusqu'a la convergence de l'algorithme
+        currentCentroids = self.currentCentroids()
+        newCentroids = self.nextCentroids()
+        nbIterations = 0
+
+        while self.compareCentroids(currentCentroids, newCentroids) is True:      
+            for i in range(self.k):
+                currentCluster = self.getCluster(i)
+                currentCluster.setCentroid(newCentroids[i])          
+
+            self.assignement()
+
+            currentCentroids = self.currentCentroids()
+            newCentroids = self.nextCentroids()
+
+            nbIterations += 1
+            
+        print("Iterations : %d" % (nbIterations))
          
     def currentCentroids(self):
         """Retourne un tableau contenant les centroides des clusters"""
@@ -82,11 +103,13 @@ class KMeanClusterer(object):
         return math.sqrt(somme)
     
     def computeCentroid(self, cluster):
-        """Calcul le centroide selon les observations actuelles du cluster"""
+        """Calcul le centroide selon les observations actuelles du cluster et en renvoi un tuple"""
         observations = cluster.getObservations()
         nbElem = len(observations)
                 
         c = self.columns
+        
+        #Tableau pour conserver les sommes des colonnes avec lesquelles on travaille
         cols = [0 for i in range(len(c))]
 
         # Iterate on cluster observations
@@ -120,14 +143,19 @@ class KMeanClusterer(object):
                 found = obs
                 global_dist = current_dist
                 
-        return found
+        return tuple(found)
+                 
     
     def printClusters(self):
         """Affiche les custers et le nb d'elem qu'ils contiennent"""
         for i in range(len(self.clusters)):
             observations = self.clusters[i].getObservations()
             
-            print("***** Cluster %d -- %d elements *****" % (i + 1, len(observations)))            
+            print("***** Cluster %d -- %d elements *****" % (i + 1, len(observations)))
+            
+            for obs in observations:
+                print obs
+                
         print("**********************")
         
     def cleanEmptyClusters(self):
@@ -173,25 +201,12 @@ class KMeanClusterer(object):
         #Assignement initial
         self.assignement()
         
-        #Iterations jusqu'a la convergence de l'algorithme
-        currentCentroids = self.currentCentroids()
-        newCentroids = self.nextCentroids()
-        nbIterations = 0
-
-        while self.compareCentroids(currentCentroids, newCentroids) is True:      
-            for i in range(self.k):
-                currentCluster = self.getCluster(i)
-                currentCluster.setCentroid(newCentroids[i])          
-
-            print("Iteration %d" % (nbIterations + 1))
-            self.assignement()
-
-            currentCentroids = self.currentCentroids()
-            newCentroids = self.nextCentroids()
-
-            nbIterations += 1
-            
-        print("Iterations : %d" % (nbIterations))
+        #self.printClusters()
+        
+        #Algorithme principal
+        self.update()  
+        
+        
         
     def findNPercent(self, cluster):
         percentage = self.n / 100.0
@@ -219,6 +234,45 @@ class KMeanClusterer(object):
             
         
         return extracted
+    
+    def toJSON(self):
+        out = []
+    
+        for i in range(self.getClusterNumber()):
+            cluster = self.getCluster(i) 
+            
+            lines = []
+            for obs in cluster.getObservations():
+                #Coordonnees
+                
+                if len(self.columns) == 2:
+                    x =obs[self.columns[0]]
+                    y = obs[self.columns[1]]
+                    z = 0
+                    
+                elif len(self.columns) == 3:
+                    x = obs[self.columns[0]]
+                    y = obs[self.columns[1]]
+                    z = obs[self.columns[2]]
+                    
+                else:
+                    x = 0
+                    y = 0
+                    z = 0
+
+                lines.append({
+                    'x' : x,
+                    'y' : y,
+                    'z' : z,
+                    'isSpam' : obs[self.row_length - 1]
+                })
+                    
+                    
+            dict_cluster = {'id' : i+1, 'points' : lines}
+            
+            out.append(dict_cluster)
+            
+        print(json.dumps(out))
         
             
     def __init__(self, k, n, columns, datafile):
