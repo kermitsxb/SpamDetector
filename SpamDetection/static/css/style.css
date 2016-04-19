@@ -3,6 +3,11 @@
 body{
 	margin: 0;
 	padding-top: 70px;
+	margin-bottom: 20px !important;
+}
+
+#myTable{
+	display:none;
 }
 
 .underlined{

@@ -18,6 +18,14 @@ $(document).ready(function () {
 			$(this).val(0);
 		}
 	});*/
+
+	$("#btnNext").click(function(){
+		if(validationEcran2()){
+			var chkChecked = getChecked();
+			var newAdd = escape('./graph/' + chkChecked.join(','));
+			window.location = newAdd;
+		}
+	});
 });
 
 
@@ -37,15 +45,23 @@ function handleCheckbox(cb){
 	}
 }
 
+function getChecked(){
+	var chkChecked = [];
+	$(':checkbox').each(function() {
+		if (this.checked){
+			chkChecked.push(this.value);
+		}
+	});	
+
+	return chkChecked;
+}
+
 function validationEcran2(){
 	var chkChecked = [], 
 	resultMesg = "", 
 	resultToken = true;
-	$(':checkbox').each(function() {
-		if (this.checked){
-			chkChecked.push(this);
-		}
-	});	
+
+	chkChecked = getChecked();
 
 	if (chkChecked.length > 3){
 		resultMesg = "Vous ne pouvez sélectionner que 3 colonnes."
@@ -60,6 +76,8 @@ function validationEcran2(){
 	if (resultMesg != ""){
 		alert(resultMesg);	
 	}
+
+	alert(chkChecked);
 	
 	return resultToken;
 }

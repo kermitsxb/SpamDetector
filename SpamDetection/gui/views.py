@@ -81,9 +81,12 @@ def statistiques(request, k, n):
 
 	html_head += "<th></th>"
 
-	for line in data_name:
-		html_head += "<th><INPUT id=" + str(line) + " type=\"checkbox\" name=" + str(line) + " onclick='handleCheckbox(this);'> " + str(line) + "</th>"
+	chkValue = 0;
 
+	for line in data_name:
+		html_head += "<th><INPUT id=" + str(line) + " type=\"checkbox\" name=" + str(line) + " onclick='handleCheckbox(this);' value="+str(chkValue)+"> " + str(line) + "</th>"
+		chkValue += 1
+	
 	data_name.close()
 
 	nRow = 1
@@ -137,6 +140,6 @@ def statistiques(request, k, n):
 
 #Fonction qui appelle la vue générant les graphiques d3js pour l'affichage
 # des résultats du KMean algorithm
-def graphique(request):
+def graphique(request, cols):
 
 	return render(request, 'gui/graph_temp.html')

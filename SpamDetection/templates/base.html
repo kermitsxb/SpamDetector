@@ -41,6 +41,7 @@ and open the template in the editor.
             <li{% if request.session.page == 'upload' %} class="active" {% endif %}><a href="{% url 'upload' %}">Upload<span class="sr-only">(current)</span></a></li>
             <li{% if request.session.page == 'stats' %} class="active" {% endif %} ><a href="stats/">Statistiques</a></li>
             <li{% if request.session.page == 'graph' %} class="active" {% endif %}><a href="graph/">Graphiques</a></li>
+        </ul>
         </div>
     </nav>
     {% block content %}
