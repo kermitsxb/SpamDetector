@@ -6,6 +6,10 @@ body{
 	margin-bottom: 20px !important;
 }
 
+#myTable_wrapper{
+	margin-bottom: 20px !important;
+}
+
 #myTable{
 	display:none;
 }
