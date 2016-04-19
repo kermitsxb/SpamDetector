@@ -2,6 +2,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
+from django.core.urlresolvers import reverse
 
 from gui.forms import UploadForm
 from gui.models import Document
