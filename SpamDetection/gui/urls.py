@@ -4,5 +4,6 @@ from gui import views
 urlpatterns = [
     url(r'^$', views.upload, name='upload'),
     url(r'^upload/$', views.upload, name='upload'),
-    url(r'^graph/(?P<cols>\w+)/$', views.graphique, name='graph')
+    url(r'^graph$', views.graphique, name='graph')
+    #url(r'^graph/(\d+)/(\d+)/(\d+)/$', views.graphique, name='graph')
 ] 

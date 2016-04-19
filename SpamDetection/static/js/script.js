@@ -22,7 +22,12 @@ $(document).ready(function () {
 	$("#btnNext").click(function(){
 		if(validationEcran2()){
 			var chkChecked = getChecked();
-			var newAdd = escape('./graph/' + chkChecked.join(','));
+			if (chkChecked.length == 2){
+				chkChecked.push(-1);
+			}
+			var newAdd = './graph?cols=' + chkChecked  ;
+			//var newAdd = './graph/' + chkChecked[0] + '/' + chkChecked[1] + '/' + chkChecked[2] + '/';
+			//var newAdd = escape('./graph/' + chkChecked.join(','));
 			window.location = newAdd;
 		}
 	});

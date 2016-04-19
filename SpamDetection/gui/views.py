@@ -7,6 +7,7 @@ from gui.forms import UploadForm
 from gui.models import Document
 
 from kmeans.normalization import Normalizer
+from kmeans.kmeans import KMeanClusterer, Cluster
 import sys
 import csv
 
@@ -140,6 +141,21 @@ def statistiques(request, k, n):
 
 #Fonction qui appelle la vue générant les graphiques d3js pour l'affichage
 # des résultats du KMean algorithm
-def graphique(request, cols):
+def graphique(request):
+	cols = request.GET['cols']
+	k = request.session['k']
+	n = request.session['n']
+	datafile = request.session['cheminFichier']
+	print >>sys.stderr, '[DEBUG] cols : ' + str(cols)
+	print >>sys.stderr, '[DEBUG] k : ' + str(k)
+	print >>sys.stderr, '[DEBUG] n : ' + str(n)
+	print >>sys.stderr, '[DEBUG] datafile : ' + str(datafile)
+
+	#kMeanClusterer = KMeanClusterer(k, n, columns, datafile)
+
+    #kMeanClusterer.performClustering()
+        
+    #mon_json = kMeanClusterer.toJSON()
+
 
 	return render(request, 'gui/graph_temp.html')
