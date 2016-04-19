@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.conf import settings
 
@@ -47,10 +47,9 @@ def upload(request):
 	        request.session['n'] = n
 
 	        print >>sys.stderr, settings.MEDIA_ROOT + request.session['cheminFichier']
-
-
-	        return statistiques(request, k, n)
-
+	        #return statistiques(request)	
+	        return HttpResponseRedirect(reverse('stats'))
+	                
 
 	else: # Si ce n'est pas du POST, c'est probablement une requête GET
 
@@ -60,7 +59,7 @@ def upload(request):
 
 #Fonction affichant l'écran 2 où est éxecuté l'algorithme de KMean et 
 # sont faites les statistiques
-def statistiques(request, k, n):
+def statistiques(request):
 	datafile = settings.MEDIA_ROOT + request.session['cheminFichier']
 
 	norm = Normalizer(datafile)
@@ -126,11 +125,9 @@ def statistiques(request, k, n):
 			html_foot += "<td>ET</td>"
 
 		print >>sys.stderr, '[DEBUG] J : ' + str(j)
-		#print >>sys.stderr, '[DEBUG] Stats[j] : ' + str(stats[j])
 		for i in range(0, len(tab)):
 			html_foot += "<td>" + str(tab[i]) + "</td>"
 			print >>sys.stderr, '[DEBUG] I : ' + str(i)
-			#print >>sys.stderr, '[DEBUG] Stats[j][i] : ' + str(stats[j][i])
 
 		html_foot += "</tr>"
 
@@ -143,19 +140,24 @@ def statistiques(request, k, n):
 # des résultats du KMean algorithm
 def graphique(request):
 	cols = request.GET['cols']
+	colonne = []
+	for col in cols.split(","):
+		if int(col) != -1:
+			print >>sys.stderr, '[DEBUG] append : ' + str(col)
+			colonne.append(int(col))
 	k = request.session['k']
 	n = request.session['n']
-	datafile = request.session['cheminFichier']
+	datafile = settings.MEDIA_ROOT + request.session['cheminFichier']
 	print >>sys.stderr, '[DEBUG] cols : ' + str(cols)
 	print >>sys.stderr, '[DEBUG] k : ' + str(k)
 	print >>sys.stderr, '[DEBUG] n : ' + str(n)
 	print >>sys.stderr, '[DEBUG] datafile : ' + str(datafile)
 
-	#kMeanClusterer = KMeanClusterer(k, n, columns, datafile)
-
-    #kMeanClusterer.performClustering()
+	kMeanClusterer = KMeanClusterer(k, n, colonne, datafile)
+	kMeanClusterer.performClustering()
         
-    #mon_json = kMeanClusterer.toJSON()
+	mon_json = kMeanClusterer.toJSON()
 
+	#print >>sys.stderr, '[DEBUG] json : ' + str(mon_json)
 
-	return render(request, 'gui/graph_temp.html')
+	return render(request, 'gui/graph_temp.html', {'data': mon_json})

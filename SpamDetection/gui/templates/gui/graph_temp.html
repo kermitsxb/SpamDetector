@@ -4,6 +4,8 @@
 
 {% block content %}
 
-
+<script>
+	var json = {% autoescape off %}{{ data }}{% endautoescape %}
+</script>
 
 {% endblock %}

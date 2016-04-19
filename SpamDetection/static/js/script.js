@@ -18,6 +18,9 @@ $(document).ready(function () {
 			$(this).val(0);
 		}
 	});*/
+	$("#btnPrev").click(function(){
+		window.location =  document.referrer;
+	});
 
 	$("#btnNext").click(function(){
 		if(validationEcran2()){
@@ -82,7 +85,7 @@ function validationEcran2(){
 		alert(resultMesg);	
 	}
 
-	alert(chkChecked);
+	//alert(chkChecked);
 	
 	return resultToken;
 }

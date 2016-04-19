@@ -272,7 +272,7 @@ class KMeanClusterer(object):
             
             out.append(dict_cluster)
             
-        print(json.dumps(out))
+        return json.dumps(out)
         
             
     def __init__(self, k, n, columns, datafile):

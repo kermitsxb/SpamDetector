@@ -4,6 +4,7 @@ from gui import views
 urlpatterns = [
     url(r'^$', views.upload, name='upload'),
     url(r'^upload/$', views.upload, name='upload'),
+    url(r'^stats/$', views.statistiques, name='stats'),
     url(r'^graph$', views.graphique, name='graph')
     #url(r'^graph/(\d+)/(\d+)/(\d+)/$', views.graphique, name='graph')
 ] 
