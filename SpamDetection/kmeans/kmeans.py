@@ -54,6 +54,29 @@ class KMeanClusterer(object):
                  
         self.cleanEmptyClusters()
         
+    def manualUpdate(self):
+        #Execute une itération de l'algorithme
+        currentCentroids = self.currentCentroids()
+        newCentroids = self.nextCentroids()
+        nbIterations = 0
+
+        if self.compareCentroids(currentCentroids, newCentroids) is True and self.is_over is False:      
+            for i in range(self.k):
+                currentCluster = self.getCluster(i)
+                currentCluster.setCentroid(newCentroids[i])          
+
+            self.assignement()
+
+            currentCentroids = self.currentCentroids()
+            newCentroids = self.nextCentroids()
+
+        else:
+            self.is_over = True
+            
+    def isOver(self):
+        return self.is_over
+        
+        
     def update(self):
         #Iterations jusqu'a la convergence de l'algorithme
         currentCentroids = self.currentCentroids()
@@ -240,13 +263,17 @@ class KMeanClusterer(object):
     
         for i in range(self.getClusterNumber()):
             cluster = self.getCluster(i) 
+            en_marge = self.findNPercent()
+            
             
             lines = []
             for obs in cluster.getObservations():
-                #Coordonnees
+                #Element de marge
+                is_en_marge = 0
                 
+                #Coordonnees
                 if len(self.columns) == 2:
-                    x =obs[self.columns[0]]
+                    x = obs[self.columns[0]]
                     y = obs[self.columns[1]]
                     z = 0
                     
@@ -260,45 +287,25 @@ class KMeanClusterer(object):
                     y = 0
                     z = 0
 
+                #Observation est une observation faisant partie des N% de marge
+                for obs_marge in en_marge:
+                    if obs == obs_marge:
+                        is_en_marge = 1
+                        break
+
                 lines.append({
                     'x' : x,
                     'y' : y,
                     'z' : z,
-                    'isSpam' : obs[self.row_length - 1]
+                    'isSpam' : obs[self.row_length - 1],
+                    'isMarge': is_en_marge
                 })
-
-            #STOCK : Ajout du centroid
-            cent = []
-            c = cluster.getCentroid()
-
-            if len(self.columns) == 2:
-                x = c[self.columns[0]]
-                y = c[self.columns[1]]
-                z = 0
-                
-            elif len(self.columns) == 3:
-                x = c[self.columns[0]]
-                y = c[self.columns[1]]
-                z = c[self.columns[2]]
-                
-            else:
-                x = 0
-                y = 0
-                z = 0
-
-            cent.append({
-                'x' : x,
-                'y' : y,
-                'z' : z,
-                'isSpam' : c[self.row_length - 1]
-            })
                     
                     
-            dict_cluster = {'id' : i+1, 'centroid' : cent ,'points' : lines}
+            dict_cluster = {'id' : i+1, 'points' : lines}
             
             out.append(dict_cluster)
-
-        #print(json.dumps(out))            
+            
         return json.dumps(out)
         
             
@@ -309,6 +316,8 @@ class KMeanClusterer(object):
         # Number of clusters wanted
         self.k = k
         self.n = n
+        
+        self.is_over = False
         
         # columns to work with
         self.columns = sorted(columns)
