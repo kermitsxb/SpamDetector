@@ -14,20 +14,27 @@
     width = ScreenX - margin.left - margin.right,
     height = ScreenY - margin.top - margin.bottom;
 
-    var x = d3.scale.linear().domain([0, 1]).range([0, width]);
-    var y = d3.scale.linear().domain([0, 1]).range([height, 0]);
+    var x = d3.scale.linear().domain([-0.01, 1]).range([0, width]);
+    var y = d3.scale.linear().domain([-0.02, 1]).range([height, 0]);
 
     var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(20);
     var yAxis = d3.svg.axis().scale(y).orient("left").ticks(20);
+
+    var zoom = d3.behavior.zoom().x(x).y(y).scaleExtent([1, 32]).on("zoom", zoomed);
 
     var svg = d3.select("body").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        .call(zoom)
         .style({'font-size': '10px', 'font-family': 'sans-serif',
             'font-style': 'normal', 'font-variant': 'normal', 
             'font-weight': 'normal'});
+
+    svg.append("rect")
+        .attr("width", width)
+        .attr("height", height);
 
     var tooltip = d3.select("body").append("div")
         .attr("class", "tooltip")
@@ -44,62 +51,77 @@
         .style({ 'stroke': 'Black', 'fill': 'none', 'stroke-width': '1px'})      
         .call(yAxis);
 
-    var color = { 0:"red", 1:"blue", 2:"orange", 3:"green" };
+    var color = { 0:"CornflowerBlue", 1:"orange", 2:"green", 3:"Indigo", 4:"purple", 5:"DeepPink", 6:"pink" };
 
     nb_clusters = Object.keys(jsonData).length;
 
     console.log( nb_clusters );
 
-    if ( {{ nb_arg }} == 2 ) {alert("2 args");} else{alert("3 args");};
+    // traiter le cas du graphe 3D ou 2D
+    // le graphe 2D s'affiche de toute façon, le graphe 3D si on spécifie une 3e coord
+    // if ( {{ nb_arg }} == 2 ) {alert("2 args");} else{alert("3 args");};
+
+    redraw();
     
-    for (var i = 0; i < nb_clusters; i++) 
+
+    function zoomed() 
     {
-        var u, v, w;
-        u = jsonData[i]["centroid"][0]["x"];
-        v = jsonData[i]["centroid"][0]["y"];
-        // draw lines
-        var lines = svg.selectAll('.lines'+i).data(jsonData[i]["points"]);
-        lines.enter().append('line').attr('class','lines'+i)
-          .attr('x1',function(d, i){ return x(d["x"]); })
-          .attr('y1',function(d, i){ return y(d["y"]); })
-          .attr('x2',x(u))
-          .attr('y2',y(v))
-          .attr('stroke', function(d) { return color[i]; })
-          .attr("stroke-width",0.5);
+        // svg.select(".x.axis").call(xAxis);
+        // svg.select(".y.axis").call(yAxis);
+        svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+    }
 
-        // draw points
-        var pointDots = svg.selectAll('.pointDots'+i).data(jsonData[i]["points"]);
-        pointDots.enter().append('circle').attr('class','pointDots'+i)
-          .attr('cx',function(d) { return x(d["x"]); })
-          .attr('cy',function(d) { return y(d["y"]); })
-          .attr('fill',function(d) { return "black"; })
-          .attr("r", function(d, i) { return 1.5 })
-          .on("mouseover", function(d) {
-              var ajoutstr = "";
-              if (d["isSpam"]) { tooltip.style("background-color", "red"); ajoutstr = "Spam!"; } else{ tooltip.style("background-color", "green"); ajoutstr = "Ce n'est pas un spam"; };
-              tooltip.transition().duration(200).style("opacity", .9);
-              tooltip.html( ajoutstr + "<br/>x = " + d["x"] + "<br/>y = " + d["y"] )
-                   .style("left", (d3.event.pageX + 5) + "px")
-                   .style("top", (d3.event.pageY - 28) + "px");
-          })
-          .on("mouseout", function(d) {
-              tooltip.transition()
-                   .duration(500)
-                   .style("opacity", 0);
-          });
+    function redraw() 
+    {
+        for (var i = 0; i < nb_clusters; i++) 
+        {
+            var u, v, w;
+            u = jsonData[i]["centroid"][0]["x"];
+            v = jsonData[i]["centroid"][0]["y"];
+            // draw lines
+            var lines = svg.selectAll('.lines'+i).data(jsonData[i]["points"]);
+            lines.enter().append('line').attr('class','lines'+i)
+              .attr('x1',function(d, i){ return x(d["x"]); })
+              .attr('y1',function(d, i){ return y(d["y"]); })
+              .attr('x2',x(u))
+              .attr('y2',y(v))
+              .attr('stroke', function(d) { return color[i]; })
+              .attr("stroke-width",0.5);
 
-        // draw centroid (mean point)
-        var pointMeans = svg.selectAll('.pointMeans'+i).data(jsonData[i]["centroid"]);
-        pointMeans.enter().append('circle').attr('class','pointMeans'+i)
-          .attr('cx',function(d){ return x(d["x"]); })
-          .attr('cy',function(d){ return y(d["y"]); })
-          .attr("fill", "white")
-          .attr("stroke",function(d) { return color[i]; })
-          .attr("stroke-width",2)
-          .attr("r", function(d, i) { return 6 });
-    };
+            // draw points
+            var pointDots = svg.selectAll('.pointDots'+i).data(jsonData[i]["points"]);
+            pointDots.enter().append('circle').attr('class','pointDots'+i)
+              .attr('cx', function(d) { return x(d["x"]); })
+              .attr('cy', function(d) { return y(d["y"]); })
+              .attr('fill', function(d) {if (d["isSpam"]) return "red"; else return "blue";} )
+              // .attr("stroke", function(d) { return "black"; })
+              .attr("r", function(d, i) { return 1.5 })
+              .on("mouseover", function(d) {
+                  var ajoutstr = "";
+                  if (d["isSpam"]) { tooltip.style("background-color", "red"); ajoutstr = "Spam!"; } else{ tooltip.style("background-color", "green"); ajoutstr = "Ce n'est pas un spam"; };
+                  tooltip.transition().duration(200).style("opacity", .9);
+                  tooltip.html( ajoutstr + "<br/>x = " + d["x"] + "<br/>y = " + d["y"] )
+                       .style("left", (d3.event.pageX + 5) + "px")
+                       .style("top", (d3.event.pageY - 28) + "px");
+              })
+              .on("mouseout", function(d) {
+                  tooltip.transition()
+                       .duration(500)
+                       .style("opacity", 0);
+              })
+              ;
 
-
+            // draw centroid (mean point)
+            var pointMeans = svg.selectAll('.pointMeans'+i).data(jsonData[i]["centroid"]);
+            pointMeans.enter().append('circle').attr('class','pointMeans'+i)
+              .attr('cx', function(d){ return x(d["x"]); })
+              .attr('cy', function(d){ return y(d["y"]); })
+              .attr("fill", "white")
+              .attr("stroke", function(d) { return color[i]; })
+              .attr("stroke-width",2)
+              .attr("r", function(d, i) { return 6 });
+        };
+    }
 
 </script>
 

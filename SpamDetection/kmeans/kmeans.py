@@ -13,6 +13,7 @@ import json
 if __name__ == "__main__":
     print "Hello World"
 
+
 class KMeanClusterer(object):
     
     def getClusterNumber(self):
@@ -263,7 +264,7 @@ class KMeanClusterer(object):
     
         for i in range(self.getClusterNumber()):
             cluster = self.getCluster(i) 
-            en_marge = self.findNPercent()
+            en_marge = self.findNPercent(cluster)
             
             
             lines = []
@@ -300,10 +301,35 @@ class KMeanClusterer(object):
                     'isSpam' : obs[self.row_length - 1],
                     'isMarge': is_en_marge
                 })
-                    
-                    
-            dict_cluster = {'id' : i+1, 'points' : lines}
-            
+
+            #STOCK : Ajout du centroid
+            cent = []
+            c = cluster.getCentroid()
+
+            if len(self.columns) == 2:
+                x = c[self.columns[0]]
+                y = c[self.columns[1]]
+                z = 0
+                
+            elif len(self.columns) == 3:
+                x = c[self.columns[0]]
+                y = c[self.columns[1]]
+                z = c[self.columns[2]]
+                
+            else:
+                x = 0
+                y = 0
+                z = 0
+
+            cent.append({
+                'x' : x,
+                'y' : y,
+                'z' : z,
+                'isSpam' : c[self.row_length - 1]
+            })    
+                      
+            dict_cluster = {'id' : i+1, 'centroid' : cent ,'points' : lines}
+                        
             out.append(dict_cluster)
             
         return json.dumps(out)
