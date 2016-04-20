@@ -125,14 +125,12 @@ def statistiques(request):
 		elif j == 3:
 			html_foot += "<td>ET</td>"
 
-		print >>sys.stderr, '[DEBUG] J : ' + str(j)
+		# print >>sys.stderr, '[DEBUG] J : ' + str(j)
 		for i in range(0, len(tab)):
 			html_foot += "<td>" + str(tab[i]) + "</td>"
-			print >>sys.stderr, '[DEBUG] I : ' + str(i)
+			# print >>sys.stderr, '[DEBUG] I : ' + str(i)
 
 		html_foot += "</tr>"
-
-
 
 	return render(request, 'gui/stat_temp.html', {'thead': html_head, 'tbody': html_body, 'tstats': html_stat, 'tfoot': html_foot})
 
@@ -142,8 +140,10 @@ def statistiques(request):
 def graphique(request):
 	cols = request.GET['cols']
 	colonne = []
+	nb = 0
 	for col in cols.split(","):
 		if int(col) != -1:
+			nb+=1
 			print >>sys.stderr, '[DEBUG] append : ' + str(col)
 			colonne.append(int(col))
 	k = request.session['k']
@@ -161,4 +161,5 @@ def graphique(request):
 
 	#print >>sys.stderr, '[DEBUG] json : ' + str(mon_json)
 
-	return render(request, 'gui/graph_temp.html', {'data': mon_json})
+	return render(request, 'gui/graph_temp.html', {'data': mon_json, 'nb_arg': nb})
+

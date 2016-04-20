@@ -30,3 +30,15 @@ body{
     height: 10px !important; /* Overwrite any previous rules */
     background-color: #FFFFFF;
 }
+
+.tooltip {
+  color: white;
+  position: absolute;
+  background-color: white;
+  border: 1px solid black;
+  margin-left: 10px;
+  width: 200px;
+  height: 65px;
+  padding: 8px;
+  pointer-events: none;
+}
