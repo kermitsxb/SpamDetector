@@ -160,9 +160,9 @@ def graphique(request):
 	global kMeanClusterer
 
 	kMeanClusterer = KMeanClusterer(k, n, colonne, datafile)
-	kMeanClusterer.performClustering()
-	# kMeanClusterer.setRandomCentroids()
-	# kMeanClusterer.assignement()
+	# kMeanClusterer.performClustering()
+	kMeanClusterer.setRandomCentroids()
+	kMeanClusterer.assignement()
 	# kMeanClusterer.update()
         
 	mon_json = kMeanClusterer.toJSON()
@@ -184,12 +184,17 @@ def updateKMean(request):
 	global kMeanClusterer
 
 	kMeanClusterer.manualUpdate()
-        
-	mon_json = kMeanClusterer.toJSON()
-	return HttpResponse(
-        mon_json,
-        content_type="application/json"
-    )
+	if kMeanClusterer.isOver():
+		print >>sys.stderr, 'L\'algorithme a convergé!'
+		return HttpResponse("FIN")
+	else:
+		mon_json = kMeanClusterer.toJSON()
+		return HttpResponse(
+	        mon_json,
+	        content_type="application/json"
+	    )
+
+	
 	#print >>sys.stderr, '[DEBUG] json : ' + str(mon_json)
 	
 	# return render(request, 'gui/graph_temp.html', {'data': mon_json, 'nb_arg': nb, 'k': k, 'n': n, 'step': step_nb})
