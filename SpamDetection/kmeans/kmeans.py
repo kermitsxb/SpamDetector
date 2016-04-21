@@ -56,7 +56,7 @@ class KMeanClusterer(object):
         self.cleanEmptyClusters()
         
     def manualUpdate(self):
-        #Execute une itération de l'algorithme
+        #Execute une iteration de l'algorithme
         currentCentroids = self.currentCentroids()
         newCentroids = self.nextCentroids()
         nbIterations = 0
@@ -158,6 +158,7 @@ class KMeanClusterer(object):
         newBarycentre = tuple(newBarycentreArray)
                 
         # Find closest observation to new center
+        """
         global_dist = sys.maxint
         found = []
         
@@ -166,8 +167,9 @@ class KMeanClusterer(object):
             if current_dist < global_dist:
                 found = obs
                 global_dist = current_dist
+        """
                 
-        return tuple(found)
+        return tuple(newBarycentre)
                  
     
     def printClusters(self):
@@ -387,4 +389,3 @@ class Cluster(object):
         
         self.resetObservations()
         self.centroid = tuple()
-    
