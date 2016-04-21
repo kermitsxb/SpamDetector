@@ -102,13 +102,13 @@ function ploty() {
         traces.push(centroid);
     }
     
-    
     var layout = {margin: {
         l: 0,
         r: 0,
         b: 0,
         t: 0
       }};
+      
     Plotly.newPlot('divPlot', traces, layout);
 }
 </script>
@@ -533,7 +533,7 @@ function ploty() {
             }
 
             var x = scales[0], y = scales[1], z = scales[2];
-            var sphereRadius = 0.2;
+            var sphereRadius = 0.12;
 
             // Draw a sphere at each x,y,z coordinate.
             var datapoints = scene.selectAll(".datapoint").data( rows );
@@ -589,7 +589,8 @@ function ploty() {
             // Follow the convention where y(x,z) is elevation.
             for (var c=0; c< Object.keys(jsonData).length; c+=1) {
                 for (var l=0; l< Object.keys(jsonData[0]["points"]).length; l+=1) {
-                    rows.push( {x: jsonData[c]["points"][l]["x"], y: jsonData[c]["points"][l]["y"], z: jsonData[c]["points"][l]["z"]} );
+                    if( typeof(jsonData[c]["points"][l]) === "unsigned" ) console.log( c, l );
+                    else rows.push( {x: jsonData[c]["points"][l]["x"], y: jsonData[c]["points"][l]["y"], z: jsonData[c]["points"][l]["z"]} );
                 }
             }
             return rows;
