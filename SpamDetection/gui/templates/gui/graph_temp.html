@@ -157,14 +157,14 @@
             var x = document.getElementsByClassName("estEnMarge");
             var i;
             for (i = 0; i < x.length; i++) {
-                x[i].style.display = "none";
+                x[i].style.display = "block";
             }
             isMargeHidded = 0;
         } else{
             var x = document.getElementsByClassName("estEnMarge");
             var i;
             for (i = 0; i < x.length; i++) {
-                x[i].style.display = "block";
+                x[i].style.display = "none";
             }
             isMargeHidded = 1;
         }
@@ -234,7 +234,7 @@
         var xl = document.getElementsByClassName("estEnMarge");
         var i;
         for (i = 0; i < xl.length; i++) {
-            xl[i].style.display = "block";
+            xl[i].style.display = "none";
         }
         isMargeHidded = 1;
     }
@@ -266,12 +266,6 @@
               .attr('cy',function(d){ return y(d["y"]); });
             pointMeans.exit().remove();
         };
-        var xl = document.getElementsByClassName("estEnMarge");
-        var i;
-        for (i = 0; i < xl.length; i++) {
-            xl[i].style.display = "block";
-        }
-        isMargeHidded = 1;
     }
 
 </script>
