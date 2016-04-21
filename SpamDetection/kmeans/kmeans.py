@@ -177,7 +177,7 @@ class KMeanClusterer(object):
             print("***** Cluster %d -- %d elements *****" % (i + 1, len(observations)))
             
             for obs in observations:
-                print obs
+                print(obs)
                 
         print("**********************")
         
