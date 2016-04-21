@@ -8,7 +8,7 @@
     <button id="aff_hide_but" type="button" class="btn btn-default" style="width: 150px; margin-bottom: 20px" onclick="toggleNdots()"><span id="but_icon" class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Afficher les<br/>points en marge</button>
     <button id="incr_but" type="button" class="btn btn-default" style="width: 150px; margin-bottom: 20px" onclick="plusK()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Incrémenter K</button>
     <button id="decr_but" type="button" class="btn btn-default" style="width: 150px; margin-bottom: 20px" onclick="moinsK()"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span> Décrémenter K</button>
-    <button id="step_but" type="button" class="btn btn-default" style="width: 150px; margin-bottom: 20px" onclick="redraw()"><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> Prochaine étape</button>
+    <button id="step_but" type="button" class="btn btn-default" style="width: 150px; margin-bottom: 20px"><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> Prochaine étape</button>
     <hr>
     <form action="/send_request/" method="POST" id="post-form" style="width: 120px; margin: auto; margin-bottom: 20px">
         {% csrf_token %}
@@ -62,7 +62,8 @@
                     console.log(json); // log the returned json to the console
                     console.log("success"); // another sanity check
                     jsonData = json;
-                    $('#step_val').text( $('#step_val').value() );
+                    $('#step_val').text( parseInt(val, 10)+1 );
+                    // cleanGraph();
                     redraw();
                 },
 
@@ -137,7 +138,7 @@
     // le graphe 2D s'affiche de toute façon, le graphe 3D si on spécifie une 3e coord
     // if ( {{ nb_arg }} == 2 ) {alert("2 args");} else{alert("3 args");};
 
-    redraw();
+    mydraw();
 
     function zoomed() 
     {
@@ -170,7 +171,14 @@
         }
     }
 
-    function redraw() 
+    function cleanGraph() 
+    {
+        for (var i = 0; i < nb_clusters; i++) {
+            graph.selectAll('.lines'+i).remove();
+        }
+    }
+
+    function mydraw() 
     {
         for (var i = 0; i < nb_clusters; i++) 
         {
@@ -178,8 +186,8 @@
             u = jsonData[i]["centroid"][0]["x"];
             v = jsonData[i]["centroid"][0]["y"];
             // draw lines
-            var lines = graph.selectAll('.lines'+i).data(jsonData[i]["points"]);
-            lines.enter().append('line')
+            var lines = graph.selectAll('.lines'+i).data(jsonData[i]["points"])
+              .enter().append('line')
               .attr('class',function(d) { if( d["isMarge"] ) return "lines"+i+" estEnMarge"; else return "lines"+i+" pasEnMarge"; })
               // .attr('class',function(d) { if( d["isMarge"] ) return "estEnMarge"; else return "pasEnMarge"; })
               .attr('x1',function(d) { return x(d["x"]); })
@@ -189,14 +197,9 @@
               .attr('stroke', function(d) { return color[i]; })
               .attr("stroke-width",0.5);
 
-            // lines.transition().duration(500)
-            //   .attr('x2',function(d){ return x(d["x"]); })
-            //   .attr('y2',function(d){ return y(d["y"]); })
-            //   .attr('stroke', function(d) { return color[i]; });
-
             // draw points
             var pointDots = graph.selectAll('.pointDots'+i).data(jsonData[i]["points"]);
-            pointDots.enter().append('circle').attr('class','pointDots'+i)
+            pointDots.enter().append('circle')
               .attr('class',function(d) { if( d["isMarge"] ) return "pointDots"+i+" estEnMarge"; else return "pointDots"+i+" pasEnMarge"; })
               .attr('cx', function(d) { return x(d["x"]); })
               .attr('cy', function(d) { return y(d["y"]); })
@@ -227,6 +230,42 @@
               .attr("stroke", function(d) { return color[i]; })
               .attr("stroke-width",2)
               .attr("r", function(d, i) { return 5 });
+
+        };
+        var xl = document.getElementsByClassName("estEnMarge");
+        var i;
+        for (i = 0; i < xl.length; i++) {
+            xl[i].style.display = "block";
+        }
+        isMargeHidded = 1;
+    }
+
+    function redraw() 
+    {
+        graph.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        for (var i = 0; i < nb_clusters; i++) 
+        {
+            var u, v, w;
+            u = jsonData[i]["centroid"][0]["x"];
+            v = jsonData[i]["centroid"][0]["y"];
+            // draw lines
+            // draw lines
+            var lines = graph.selectAll('.lines'+i)
+              .attr('stroke', function(d) { return color[i]; })
+              .attr("stroke-width",0.5);
+
+            lines.transition().duration(500)
+              .attr('x2',x(u))
+              .attr('y2',y(v))
+              .attr('stroke', function(d) { return color[i]; })
+              .attr("stroke-width",0.5);
+
+            // draw centroid (mean point)
+            var pointMeans = graph.selectAll('.pointMeans'+i).data(jsonData[i]["centroid"]);
+            pointMeans.transition().duration(200)
+              .attr('cx',function(d){ return x(d["x"]); })
+              .attr('cy',function(d){ return y(d["y"]); });
+            pointMeans.exit().remove();
         };
         var xl = document.getElementsByClassName("estEnMarge");
         var i;
