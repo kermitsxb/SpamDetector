@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.views.decorators.csrf import csrf_exempt
 
 from gui.forms import UploadForm
 from gui.models import Document
@@ -11,6 +12,9 @@ from kmeans.normalization import Normalizer
 from kmeans.kmeans import KMeanClusterer, Cluster
 import sys
 import csv
+import json
+
+kMeanClusterer = None
 
 
 # Vue de base ./
@@ -134,7 +138,6 @@ def statistiques(request):
 
 	return render(request, 'gui/stat_temp.html', {'thead': html_head, 'tbody': html_body, 'tstats': html_stat, 'tfoot': html_foot})
 
-
 #Fonction qui appelle la vue générant les graphiques d3js pour l'affichage
 # des résultats du KMean algorithm
 def graphique(request):
@@ -144,7 +147,7 @@ def graphique(request):
 	for col in cols.split(","):
 		if int(col) != -1:
 			nb+=1
-			print >>sys.stderr, '[DEBUG] append : ' + str(col)
+			# print >>sys.stderr, '[DEBUG] append : ' + str(col)
 			colonne.append(int(col))
 	k = request.session['k']
 	n = request.session['n']
@@ -154,12 +157,38 @@ def graphique(request):
 	print >>sys.stderr, '[DEBUG] n : ' + str(n)
 	print >>sys.stderr, '[DEBUG] datafile : ' + str(datafile)
 
+	global kMeanClusterer
+
 	kMeanClusterer = KMeanClusterer(k, n, colonne, datafile)
-	kMeanClusterer.performClustering()
+	kMeanClusterer.setRandomCentroids()
+	kMeanClusterer.assignement()
         
 	mon_json = kMeanClusterer.toJSON()
 
 	#print >>sys.stderr, '[DEBUG] json : ' + str(mon_json)
 
-	return render(request, 'gui/graph_temp.html', {'data': mon_json, 'nb_arg': nb})
+	return render(request, 'gui/graph_temp.html', {'data': mon_json, 'nb_arg': nb, 'k': k, 'n': n, 'step': 0})
+
+# Fonction qui passe à l'étape suivante dans le kmean via ajax
+@csrf_exempt
+def updateKMean(request):
+	step_nb = int(request.POST.get("step").encode('ascii','ignore')) + 1
+	k = int(request.POST.get("k").encode('ascii','ignore')) + 1
+	n = int(request.POST.get("n").encode('ascii','ignore')) + 1
+	nb = -1
+
+	print >>sys.stderr, '[DEBUG] step_nb : ' + str(step_nb)
+
+	global kMeanClusterer
+
+	kMeanClusterer.manualUpdate()
+        
+	mon_json = kMeanClusterer.toJSON()
+	return HttpResponse(
+        mon_json,
+        content_type="application/json"
+    )
+	#print >>sys.stderr, '[DEBUG] json : ' + str(mon_json)
+	
+	# return render(request, 'gui/graph_temp.html', {'data': mon_json, 'nb_arg': nb, 'k': k, 'n': n, 'step': step_nb})
 
