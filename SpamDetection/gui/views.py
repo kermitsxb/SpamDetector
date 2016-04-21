@@ -160,9 +160,9 @@ def graphique(request):
 	global kMeanClusterer
 
 	kMeanClusterer = KMeanClusterer(k, n, colonne, datafile)
-	# kMeanClusterer.performClustering()
-	kMeanClusterer.setRandomCentroids()
-	kMeanClusterer.assignement()
+	kMeanClusterer.performClustering()
+	#kMeanClusterer.setRandomCentroids()
+	#kMeanClusterer.assignement()
 	# kMeanClusterer.update()
         
 	mon_json = kMeanClusterer.toJSON()

@@ -85,71 +85,6 @@
 
     if ( {{ nb_arg }} == 2 ) 
     {
-        d3.select('#divPlot').style('display', "none");
-
-        var isMargeHidded = 0;
-
-        var ScreenX = window.innerWidth-200;
-        var ScreenY = window.innerHeight-100;
-
-        var margin = {top: 30, right: 40, bottom: 30, left: 50},
-        width = ScreenX - margin.left - margin.right,
-        height = ScreenY - margin.top - margin.bottom;
-
-        var x = d3.scale.linear().domain([-0.01, 1]).range([0, width]);
-        var y = d3.scale.linear().domain([-0.02, 1]).range([height, 0]);
-
-        var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(20);
-        var yAxis = d3.svg.axis().scale(y).orient("left").ticks(20);
-
-        var zoom = d3.behavior.zoom()
-            .scaleExtent([1, 10])
-            .on("zoom", zoomed);
-
-        var svg = d3.select("body").append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom);
-        var graph = svg.append("g");
-            
-        graph.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-            .call(zoom)
-            .style({'font-size': '10px', 'font-family': 'sans-serif',
-                'font-style': 'normal', 'font-variant': 'normal', 
-                'font-weight': 'normal'});
-
-        // svg.style("cursor","move");
-
-        graph.append("rect")
-            .attr("width", width)
-            .attr("height", height);
-
-        var tooltip = d3.select("body").append("div")
-            .attr("class", "tooltip")
-            .style("opacity", 0);
-
-        graph.append("g")            // Add the X Axis
-            .attr("class", "x axis")
-            .attr("transform", "translate(0," + height + ")")
-            .style({ 'stroke': 'Black', 'fill': 'none', 'stroke-width': '1px'})
-            .call(xAxis);
-
-        graph.append("g")             
-            .attr("class", "y axis")    
-            .style({ 'stroke': 'Black', 'fill': 'none', 'stroke-width': '1px'})      
-            .call(yAxis);
-
-        var color = { 0:"CornflowerBlue", 1:"orange", 2:"green", 3:"Indigo", 4:"purple", 5:"DeepPink", 6:"pink" };
-
-        nb_clusters = Object.keys(jsonData).length;
-
-        console.log( nb_clusters );
-
-        // traiter le cas du graphe 3D ou 2D
-        // le graphe 2D s'affiche de toute façon, le graphe 3D si on spécifie une 3e coord
-        // if ( {{ nb_arg }} == 2 ) {alert("2 args");} else{alert("3 args");};
-
-        mydraw();
-
         function zoomed() 
         {
             graph.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
@@ -252,20 +187,75 @@
                 }
             }
         }
-    } 
-    else
-    {
-        var ScreenX = window.innerWidth-150;
-        var ScreenY = window.innerHeight-20;
+        
+        d3.select('#divPlot').style('display', "none");
+
+        var isMargeHidded = 0;
+
+        var ScreenX = window.innerWidth-200;
+        var ScreenY = window.innerHeight-100;
 
         var margin = {top: 30, right: 40, bottom: 30, left: 50},
         width = ScreenX - margin.left - margin.right,
         height = ScreenY - margin.top - margin.bottom;
 
-        d3.select('html').style('height','100%').style('width','100%');
-        d3.select('body').style('height','100%').style('width','100%');
-        d3.select('#divPlot').style('width', width+"px").style('height', height+"px").style('background-color', "lightgray");
-        scatterPlot3d( d3.select('#divPlot') );
+        var x = d3.scale.linear().domain([-0.01, 1]).range([0, width]);
+        var y = d3.scale.linear().domain([-0.02, 1]).range([height, 0]);
+
+        var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(20);
+        var yAxis = d3.svg.axis().scale(y).orient("left").ticks(20);
+
+        var zoom = d3.behavior.zoom()
+            .scaleExtent([1, 10])
+            .on("zoom", zoomed);
+
+        var svg = d3.select("body").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom);
+        var graph = svg.append("g");
+            
+        graph.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+            .call(zoom)
+            .style({'font-size': '10px', 'font-family': 'sans-serif',
+                'font-style': 'normal', 'font-variant': 'normal', 
+                'font-weight': 'normal'});
+
+        // svg.style("cursor","move");
+
+        graph.append("rect")
+            .attr("width", width)
+            .attr("height", height);
+
+        var tooltip = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+        graph.append("g")            // Add the X Axis
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .style({ 'stroke': 'Black', 'fill': 'none', 'stroke-width': '1px'})
+            .call(xAxis);
+
+        graph.append("g")             
+            .attr("class", "y axis")    
+            .style({ 'stroke': 'Black', 'fill': 'none', 'stroke-width': '1px'})      
+            .call(yAxis);
+
+        var color = { 0:"CornflowerBlue", 1:"orange", 2:"green", 3:"Indigo", 4:"purple", 5:"DeepPink", 6:"pink" };
+
+        nb_clusters = Object.keys(jsonData).length;
+
+        console.log( nb_clusters );
+
+        // traiter le cas du graphe 3D ou 2D
+        // le graphe 2D s'affiche de toute façon, le graphe 3D si on spécifie une 3e coord
+        // if ( {{ nb_arg }} == 2 ) {alert("2 args");} else{alert("3 args");};
+
+        mydraw();
+    } 
+    else
+    {
+        
 
         // Create a 3d scatter plot within d3 selection parent.
         function scatterPlot3d( parent )
@@ -530,6 +520,18 @@
           initializePlot();
           setInterval( updateData, defaultDuration );
         }
+        
+        var ScreenX = window.innerWidth-150;
+        var ScreenY = window.innerHeight-20;
+
+        var margin = {top: 30, right: 40, bottom: 30, left: 50},
+        width = ScreenX - margin.left - margin.right,
+        height = ScreenY - margin.top - margin.bottom;
+
+        d3.select('html').style('height','100%').style('width','100%');
+        d3.select('body').style('height','100%').style('width','100%');
+        d3.select('#divPlot').style('width', width+"px").style('height', height+"px").style('background-color', "lightgray");
+        scatterPlot3d( d3.select('#divPlot') );
     }
 
 </script>

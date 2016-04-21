@@ -10,9 +10,6 @@ import math
 import sys
 import json
 
-if __name__ == "__main__":
-    print "Hello World"
-
 
 class KMeanClusterer(object):
     
@@ -158,7 +155,7 @@ class KMeanClusterer(object):
         newBarycentre = tuple(newBarycentreArray)
                 
         # Find closest observation to new center
-        """
+        """        
         global_dist = sys.maxint
         found = []
         
@@ -167,9 +164,9 @@ class KMeanClusterer(object):
             if current_dist < global_dist:
                 found = obs
                 global_dist = current_dist
+        
         """
-                
-        return tuple(newBarycentre)
+        return newBarycentre
                  
     
     def printClusters(self):
