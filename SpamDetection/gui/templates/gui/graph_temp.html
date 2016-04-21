@@ -6,8 +6,6 @@
 
 <aside>
     <button id="aff_hide_but" type="button" class="btn btn-default" style="width: 150px; margin-bottom: 20px" onclick="toggleNdots()"><span id="but_icon" class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Afficher les<br/>points en marge</button>
-    <button id="incr_but" type="button" class="btn btn-default" style="width: 150px; margin-bottom: 20px" onclick="plusK()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Incrémenter K</button>
-    <button id="decr_but" type="button" class="btn btn-default" style="width: 150px; margin-bottom: 20px" onclick="moinsK()"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span> Décrémenter K</button>
     <button id="step_but" type="button" class="btn btn-default" style="width: 150px; margin-bottom: 20px"><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> Prochaine étape</button>
     <hr>
     <form action="/send_request/" method="POST" id="post-form" style="width: 120px; margin: auto; margin-bottom: 20px">
@@ -142,6 +140,7 @@
 
     function zoomed() 
     {
+        svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
         graph.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
     }
 
